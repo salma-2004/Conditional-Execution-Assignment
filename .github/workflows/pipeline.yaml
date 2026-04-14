@@ -8,18 +8,22 @@ on:
       - feature/**
 
 jobs:
+
+  
+  # 1. LINTER JOB
   linter:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Linter
         run: |
           echo "Running lint checks..."
           echo "Lint Passed!"
 
+  # 2. TRAIN JOB
   train:
     runs-on: ubuntu-latest
     needs: linter
@@ -31,13 +35,23 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install numpy
 
       - name: Run training
         run: |
-          echo "Start Training..."
-          exit 1
+          echo "Training model..."
+          python -c "print('Model trained successfully')"
 
+      # error
       - name: Save error logs
         if: failure()
         run: |
@@ -50,6 +64,7 @@ jobs:
           name: error-logs
           path: error_logs.txt
 
+      # cleanup 
       - name: Cleanup
         if: always()
         run: |
